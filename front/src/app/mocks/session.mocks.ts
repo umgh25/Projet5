@@ -1,4 +1,5 @@
 import { SessionInformation } from '../interfaces/sessionInformation.interface';
+import { SessionService } from '../services/session.service';
 
 export const userRequestMock: SessionInformation = {
   token:
@@ -10,3 +11,7 @@ export const userRequestMock: SessionInformation = {
   lastName: 'Admin',
   admin: true,
 };
+
+export const createSessionServiceMock = (): Partial<jest.Mocked<SessionService>> => ({
+  isLogged: false,
+});
