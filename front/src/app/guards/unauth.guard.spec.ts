@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UnauthGuard } from './unauth.guard';
-import { SessionService } from '../services/session.service';
 import { expect } from '@jest/globals';
-import { createRouterMock } from '../../mocks/auth.mocks';
-import { createSessionServiceMock } from '../../mocks/session.mocks';
+import { SessionService } from '../services/session.service';
+import { createRouterMock } from 'src/mocks/auth.mocks';
+import { createSessionServiceMock } from 'src/mocks/session.mocks';
 
 
 describe('UnauthGuard', () => {

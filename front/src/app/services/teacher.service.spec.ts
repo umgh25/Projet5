@@ -1,17 +1,13 @@
-import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { expect } from '@jest/globals';
-
-import { TeacherService } from './teacher.service';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import { TeacherService } from './teacher.service';
 import { Teacher } from '../interfaces/teacher.interface';
-import {
-  getAllTeachersResponseMock,
-  teacherPath,
-} from '../mocks/teacher.mocks';
+import { getAllTeachersResponseMock, teacherPath } from 'src/mocks/teacher.mocks';
+
 
 describe('TeacherService', () => {
   let service: TeacherService;

@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { expect } from '@jest/globals';
 import { AuthGuard } from './auth.guard';
 import { SessionService } from '../services/session.service';
-import { expect } from '@jest/globals';
-import { createRouterMock, loginResponseMock  } from '../../mocks/auth.mocks';
-import { createSessionServiceMock } from '../../mocks/session.mocks';
+import { createRouterMock, sessionInformation } from 'src/mocks/auth.mocks';
+import { createSessionServiceMock } from 'src/mocks/session.mocks';
+
 
 
 describe('AuthGuard', () => {
@@ -59,7 +60,7 @@ describe('AuthGuard', () => {
     // Simulate user login
     sessionService.isLogged = true;
     sessionService.sessionInformation = {
-      ...loginResponseMock,
+      ...sessionInformation,
       admin: false,
     };
 

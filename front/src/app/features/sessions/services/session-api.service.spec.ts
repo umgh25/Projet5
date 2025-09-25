@@ -8,7 +8,8 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { Session } from '../interfaces/session.interface';
-import { sessionApiPath, sessionsMock } from 'src/app/mocks/session-api.mocks';
+import { sessionApiPath, sessionsMock } from 'src/mocks/session-api.mocks';
+
 
 describe('SessionApiService', () => {
   let service: SessionApiService;

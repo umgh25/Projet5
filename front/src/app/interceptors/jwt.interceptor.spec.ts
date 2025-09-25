@@ -1,17 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 import { JwtInterceptor } from './jwt.interceptor';
-import { SessionService } from '../services/session.service';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { expect } from '@jest/globals';
-import { createSessionServiceMock } from '../../mocks/session.mocks';
+import { SessionService } from '../services/session.service';
+import { createSessionServiceMock } from 'src/mocks/session.mocks';
+
 
 describe('JwtInterceptor', () => {
   let interceptor: JwtInterceptor;
-  let sessionService: SessionService;
+  let sessionService: jest.Mocked<SessionService>;
   let httpMock: HttpTestingController;
   let httpClient: HttpClient;
 
@@ -28,7 +29,7 @@ describe('JwtInterceptor', () => {
     interceptor = TestBed.inject(JwtInterceptor);
     httpMock = TestBed.inject(HttpTestingController);
     httpClient = TestBed.inject(HttpClient);
-    sessionService = TestBed.inject(SessionService);
+    sessionService = TestBed.inject(SessionService) as jest.Mocked<SessionService> ;
   });
 
   afterEach(() => {

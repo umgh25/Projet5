@@ -6,7 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { expect } from '@jest/globals';
 import { UserService } from './user.service';
 import { User } from '../interfaces/user.interface';
-import { getUserResponseMock, userPath } from '../mocks/user.mocks';
+import { userMock, userPath } from 'src/mocks/user.mocks';
 
 describe('UserService', () => {
   let service: UserService;
@@ -30,7 +30,7 @@ describe('UserService', () => {
   });
 
   it('should retrieve user by id', () => {
-    const response: User = getUserResponseMock;
+    const response: User = userMock;
     service.getById('1').subscribe((user) => {
       expect(user).toEqual(response);
     });

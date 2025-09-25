@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { expect } from '@jest/globals';
-
+import { first } from 'rxjs';
 import { SessionService } from './session.service';
 import { SessionInformation } from '../interfaces/sessionInformation.interface';
-import { userRequestMock } from '../mocks/session.mocks';
-import { first } from 'rxjs';
+import { adminRequestMock } from 'src/mocks/session.mocks';
+
 
 describe('SessionService', () => {
   let service: SessionService;
@@ -19,7 +19,7 @@ describe('SessionService', () => {
   });
 
   it('should log in a user', () => {
-    const user: SessionInformation = userRequestMock;
+    const user: SessionInformation = adminRequestMock;
     service.logIn(user);
 
     expect(service.isLogged).toBe(true);
@@ -34,7 +34,7 @@ describe('SessionService', () => {
   });
 
   it('should emit isLogged as true when user logs in', (done) => {
-    const user: SessionInformation = userRequestMock;
+    const user: SessionInformation = adminRequestMock;
 
     service.$isLogged().subscribe((isLogged) => {
       if (isLogged) {
