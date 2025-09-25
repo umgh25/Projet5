@@ -55,6 +55,8 @@ describe('AuthGuard', () => {
 
   it('should properly handle state changes through SessionService', () => {
     // Test initial state
+    sessionService.isLogged = false;
+    sessionService.sessionInformation = undefined;
     expect(guard.canActivate()).toBe(false);
 
     // Simulate user login
