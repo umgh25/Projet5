@@ -2,29 +2,27 @@ import { of } from "rxjs";
 import { Teacher } from "src/app/interfaces/teacher.interface";
 import { TeacherService } from "src/app/services/teacher.service";
 
-
-
 export const teacherPath = 'api/teacher';
 
 export const getAllTeachersResponseMock: Teacher[] = [
   {
     id: 1,
-    lastName: 'Teacher 1',
-    firstName: 'Test 1',
+    lastName: 'Dupont',
+    firstName: 'Jeanne',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
     id: 2,
-    lastName: 'Teacher 2',
-    firstName: 'Test 2',
+    lastName: 'Martin',
+    firstName: 'Kylian',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
     id: 3,
-    lastName: 'Teacher 3',
-    firstName: 'Test 2',
+    lastName: 'Durand',
+    firstName: 'Amélie',
     createdAt: new Date(),
     updatedAt: new Date(),
   },
