@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { AuthGuard } from './auth.guard';
 import { SessionService } from '../services/session.service';
 import { expect } from '@jest/globals';
-import { createRouterMock, loginResponseMock  } from '../mocks/auth.mocks';
-import { createSessionServiceMock } from '../mocks/session.mocks';
+import { createRouterMock, loginResponseMock  } from '../../mocks/auth.mocks';
+import { createSessionServiceMock } from '../../mocks/session.mocks';
 
 
 describe('AuthGuard', () => {

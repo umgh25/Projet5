@@ -1,14 +1,17 @@
-import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
-import { LoginRequest } from '../features/auth/interfaces/loginRequest.interface';
-import { RegisterRequest } from '../features/auth/interfaces/registerRequest.interface';
 import { Router } from '@angular/router';
-import { SessionService } from '../services/session.service';
+import { LoginRequest } from 'src/app/features/auth/interfaces/loginRequest.interface';
+import { RegisterRequest } from 'src/app/features/auth/interfaces/registerRequest.interface';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
+
+
+
 
 export const authPath = 'api/auth';
 
 export const sessionInformation: SessionInformation = {
   token:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc4YzUwNGVlNzJlZmQ0NTNmMWNkOWQiLCJlbWFpbCI6InUubXVnaGFsQHR4LXN0dWRpby5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTc0MTEzMDUsImV4cCI6MTc1NzQzNjUwNX0.-LTk0sxSXr71xcc8mrpwPalWxGBPRyDCzTnAaTwiYfo',
+    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ5b2dhQHN0dWRpby5jb20iLCJpYXQiOjE3MzkyNjk0MDAsImV4cCI6MTczOTM1NTgwMH0.QBnFSkldurGOIjhHX-NYym9UXHCngbYp6ZdM_SsYnHxpGcUbQLsrGnunVrM6eLbtx2icTVtDK36Zj0yw0bdpfQ',
   type: 'Bearer',
   id: 3,
   username: 'yoga@studio.com',
@@ -44,3 +47,8 @@ export const invalidRegisterRequestMock: RegisterRequest = {
 export const createRouterMock = (): Partial<jest.Mocked<Router>> => ({
   navigate: jest.fn(),
 });
+
+export const createAuthServiceMock = (): Partial<jest.Mocked<AuthService>> => ({
+  register: jest.fn(),
+  login: jest.fn()
+})

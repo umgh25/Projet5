@@ -1,4 +1,8 @@
-import { Teacher } from '../interfaces/teacher.interface';
+import { of } from "rxjs";
+import { Teacher } from "src/app/interfaces/teacher.interface";
+import { TeacherService } from "src/app/services/teacher.service";
+
+
 
 export const teacherPath = 'api/teacher';
 
@@ -25,3 +29,10 @@ export const getAllTeachersResponseMock: Teacher[] = [
     updatedAt: new Date(),
   },
 ];
+
+export const createTeacherServiceMock = (): Partial<jest.Mocked<TeacherService>> => ({
+  all: jest.fn().mockReturnValue(of(getAllTeachersResponseMock)),
+  detail: jest.fn().mockImplementation((id: string) =>
+    of(getAllTeachersResponseMock.find((teacher) => teacher.id === +id))
+  ),
+});

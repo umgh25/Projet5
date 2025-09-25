@@ -7,7 +7,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { expect } from '@jest/globals';
-import { createSessionServiceMock } from '../mocks/session.mocks';
+import { createSessionServiceMock } from '../../mocks/session.mocks';
 
 describe('JwtInterceptor', () => {
   let interceptor: JwtInterceptor;

@@ -10,10 +10,10 @@ import { expect } from '@jest/globals';
 
 import { MeComponent } from './me.component';
 import { Router } from '@angular/router';
-import { createRouterMock, sessionInformation } from 'src/app/mocks/auth.mocks';
-import { createSessionServiceMock } from 'src/app/mocks/session.mocks';
+import { createRouterMock, sessionInformation } from 'src/mocks/auth.mocks';
+import { createSessionServiceMock } from 'src/mocks/session.mocks';
 import { UserService } from 'src/app/services/user.service';
-import { createUserServiceMock, userMock } from 'src/app/mocks/user.mocks';
+import { createUserServiceMock, userMock } from 'src/mocks/user.mocks';
 
 describe('MeComponent', () => {
   let component: MeComponent;
