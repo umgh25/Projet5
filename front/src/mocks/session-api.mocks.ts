@@ -15,6 +15,8 @@ export const sessionsMock: Session[] = [
     date: new Date('2025-03-01T00:00:00Z'),
     teacher_id: 1,
     users: [1, 2, 3],
+    createdAt: new Date('2025-02-20T00:00:00Z'),
+    updatedAt: new Date('2025-02-20T00:00:00Z'),
   },
   {
     id: 2,
@@ -24,7 +26,9 @@ export const sessionsMock: Session[] = [
     date: new Date('2024-12-29T00:00:00Z'),
     teacher_id: 2,
     users: [],
-  },
+    createdAt: new Date('2025-02-20T00:00:00Z'),
+    updatedAt: new Date('2025-02-20T00:00:00Z'),
+  }
 ];
 
 export const createSessionApiServiceMock = (): Partial<jest.Mocked<SessionApiService>> => ({
