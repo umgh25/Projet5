@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SessionInformation } from 'src/app/interfaces/sessionInformation.interface';
@@ -35,15 +35,19 @@ export class LoginComponent {
   constructor(private authService: AuthService,
               private fb: FormBuilder,
               private router: Router,
-              private sessionService: SessionService) {
+              private sessionService: SessionService,
+              private ngZone: NgZone) {
   }
 
   public submit(): void {
     const loginRequest = this.form.value as LoginRequest;
     this.authService.login(loginRequest).subscribe({
       next: (response: SessionInformation) => {
+        this.onError = false;
         this.sessionService.logIn(response);
-        this.router.navigate(['/sessions']);
+        this.ngZone.run(() => {
+          this.router.navigate(['/sessions']);
+        });
       },
       error: error => this.onError = true,
     });
