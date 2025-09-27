@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Sessions', () => {
   describe('Load Sessions', () => {
     beforeEach(() => {
@@ -9,7 +11,7 @@ describe('Sessions', () => {
       cy.wait('@getSessionsRequest').then((interception) => {
         const response = interception.response!.body;
         cy.get('.item').should('have.length', response.length).and('be.visible');
-          response.forEach((session, index) => {
+          response.forEach((session: Cypress.YogaSession, index: number) => {
             if (index > 3) return;
             cy.checkSessionCard(index, session);
           });
@@ -298,7 +300,7 @@ describe('Sessions', () => {
         cy.wait('@getSessionsRequest').then((interception) => {
           const responseAfterDelete = interception.response!.body;
           expect(responseAfterDelete.length).to.eq(response.length - 1);
-          expect(responseAfterDelete.map(session => session.id)).to.not.include(sessionId);
+          expect(responseAfterDelete.map((session: { id: any; }) => session.id)).to.not.include(sessionId);
 
 
           cy.wait('@deleteSessionRequest').its('response.body').should('deep.equal', {

@@ -1,17 +1,34 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*"
-  ],
+  "ignorePatterns": ["projects/**/*"],
   "overrides": [
     {
-      "files": [
-        "*.ts"
-      ],
+      "files": ["front/cypress/**/*.{ts,tsx,js}"],
+      "plugins": ["cypress"],
+      "extends": ["plugin:cypress/recommended"],
+      "env": {
+        "browser": true,
+        "cypress/globals": true,
+        "mocha": true
+      },
       "parserOptions": {
-        "project": [
-          "front/tsconfig.json"
-        ],
+        "project": ["front/cypress/tsconfig.json"],
+        "createDefaultProgram": true
+      },
+      "rules": {
+        "no-unused-expressions": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+        ]
+      }
+    },
+    {
+      "files": ["*.ts"],
+      "excludedFiles": ["front/cypress/**/*"],
+      "parserOptions": {
+        "project": ["front/tsconfig.json"],
         "createDefaultProgram": true
       },
       "extends": [
@@ -21,29 +38,17 @@
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
-          {
-            "type": "attribute",
-            "prefix": "app",
-            "style": "camelCase"
-          }
+          { "type": "attribute", "prefix": "app", "style": "camelCase" }
         ],
         "@angular-eslint/component-selector": [
           "error",
-          {
-            "type": "element",
-            "prefix": "app",
-            "style": "kebab-case"
-          }
+          { "type": "element", "prefix": "app", "style": "kebab-case" }
         ]
       }
     },
     {
-      "files": [
-        "*.html"
-      ],
-      "extends": [
-        "plugin:@angular-eslint/template/recommended"
-      ],
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {}
     }
   ]
