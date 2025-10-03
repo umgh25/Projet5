@@ -91,7 +91,7 @@ Cypress.Commands.add('interceptSessionDetail', ({ sessionId, userId = 3, partici
   const index = sessionsMock.findIndex(session => session.id === sessionId);
   const sessionData = {
     ...sessionsMock[index],
-    users: participate ? [...sessionsMock[index].users, userId] : sessionsMock[index].users.filter((user: number) => user !== userId)
+    users: participate ? [...sessionsMock[index].users, userId] : sessionsMock[index].users.filter(user => user !== userId)
   }
 
   console.log(sessionData);
