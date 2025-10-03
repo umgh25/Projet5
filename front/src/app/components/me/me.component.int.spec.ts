@@ -7,7 +7,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { SessionService } from 'src/app/services/session.service';
 import { UserService } from 'src/app/services/user.service';
 import { User } from 'src/app/interfaces/user.interface';
@@ -20,16 +20,11 @@ describe('MeComponent Integration Tests', () => {
   let component: MeComponent;
   let fixture: ComponentFixture<MeComponent>;
   let compiled: HTMLElement;
+  let httpMock: HttpTestingController;
   
-  // Jest mocks for integration tests
-  let mockSessionService: {
-    sessionInformation: any;
-    logOut: jest.MockedFunction<() => void>;
-  };
-  let mockUserService: {
-    getById: jest.MockedFunction<(id: string) => any>;
-    delete: jest.MockedFunction<(id: string) => any>;
-  };
+  // Services and mocks
+  let sessionService: SessionService;
+  let userService: UserService;
   let mockRouter: {
     navigate: jest.MockedFunction<(commands: any[]) => Promise<boolean>>;
   };
@@ -63,7 +58,7 @@ describe('MeComponent Integration Tests', () => {
   const mockSessionInfo = {
     token: 'mock-token',
     type: 'Bearer',
-    id: 1,
+    id: 2,
     username: 'testuser',
     firstName: 'John',
     lastName: 'Doe',
@@ -71,43 +66,29 @@ describe('MeComponent Integration Tests', () => {
   };
 
   beforeEach(async () => {
-    // Create Jest mocks
-    mockSessionService = {
-      sessionInformation: mockSessionInfo,
-      logOut: jest.fn()
-    };
-    
-    mockUserService = {
-      getById: jest.fn(),
-      delete: jest.fn()
-    };
-    
+    // Create Jest mocks for Router and MatSnackBar only
     mockRouter = {
-      navigate: jest.fn()
+      navigate: jest.fn().mockResolvedValue(true)
     };
     
     mockMatSnackBar = {
       open: jest.fn()
     };
 
-    // Default mock behaviors
-    mockUserService.getById.mockReturnValue(of(mockRegularUser));
-    mockUserService.delete.mockReturnValue(of({}));
-    mockRouter.navigate.mockResolvedValue(true);
-
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
       imports: [
+        HttpClientTestingModule, // ✅ For mocking HTTP requests
         MatSnackBarModule,
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
-        MatButtonModule // ✅ Important for mat-button testing
+        MatButtonModule
       ],
       providers: [
-        { provide: SessionService, useValue: mockSessionService },
-        { provide: UserService, useValue: mockUserService },
+        SessionService, // ✅ REAL service
+        UserService,    // ✅ REAL service
         { provide: Router, useValue: mockRouter },
         { provide: MatSnackBar, useValue: mockMatSnackBar }
       ],
@@ -116,13 +97,34 @@ describe('MeComponent Integration Tests', () => {
     fixture = TestBed.createComponent(MeComponent);
     component = fixture.componentInstance;
     compiled = fixture.nativeElement as HTMLElement;
+    
+    // Get REAL services
+    sessionService = TestBed.inject(SessionService);
+    userService = TestBed.inject(UserService);
+    httpMock = TestBed.inject(HttpTestingController);
+    
+    // Simulate logged-in user session
+    sessionService.logIn(mockSessionInfo);
+  });
+
+  afterEach(() => {
+    // Verify no outstanding HTTP requests
+    httpMock.verify();
   });
 
   describe('Initial rendering', () => {
     it('should create component and render basic structure', () => {
       expect(component).toBeTruthy();
       
-      // Trigger change detection to render the template
+      // Trigger ngOnInit which calls the real service
+      fixture.detectChanges();
+      
+      // Intercept the REAL HTTP call made by UserService
+      const req = httpMock.expectOne('api/user/2');
+      expect(req.request.method).toBe('GET');
+      
+      // Respond with mock data
+      req.flush(mockRegularUser);
       fixture.detectChanges();
       
       // Check if mat-card is rendered
@@ -133,11 +135,21 @@ describe('MeComponent Integration Tests', () => {
     it('should display title "User information"', () => {
       fixture.detectChanges();
       
+      // Handle the HTTP request
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
+      fixture.detectChanges();
+      
       const title = compiled.querySelector('h1');
       expect(title?.textContent?.trim()).toBe('User information');
     });
 
     it('should display back button with arrow icon', () => {
+      fixture.detectChanges();
+      
+      // Handle the HTTP request
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
       fixture.detectChanges();
       
       const backButton = compiled.querySelector('button[mat-icon-button]');
@@ -150,8 +162,11 @@ describe('MeComponent Integration Tests', () => {
 
   describe('User data display', () => {
     beforeEach(() => {
-      // Ensure user data is loaded
-      fixture.detectChanges(); // Triggers ngOnInit
+      // Trigger ngOnInit and handle HTTP request
+      fixture.detectChanges();
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
+      fixture.detectChanges();
     });
 
     it('should display user name with uppercase pipe', () => {
@@ -188,10 +203,15 @@ describe('MeComponent Integration Tests', () => {
 
   describe('Conditional rendering based on user role', () => {
     it('should show admin message when user is admin', () => {
-      // Arrange - Set up admin user
-      mockUserService.getById.mockReturnValue(of(mockAdminUser));
+      // Simulate admin user session
+      sessionService.logIn({ ...mockSessionInfo, id: 1, admin: true });
       
-      // Act - Trigger component initialization
+      // Trigger ngOnInit
+      fixture.detectChanges();
+      
+      // Intercept and respond with admin user data
+      const req = httpMock.expectOne('api/user/1');
+      req.flush(mockAdminUser);
       fixture.detectChanges();
       
       // Assert - Admin message should be visible
@@ -200,7 +220,12 @@ describe('MeComponent Integration Tests', () => {
     });
 
     it('should hide admin message when user is not admin', () => {
-      // Regular user is already set up in beforeEach
+      // Regular user session already set in beforeEach
+      fixture.detectChanges();
+      
+      // Handle HTTP request
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
       fixture.detectChanges();
       
       const adminMessage = compiled.querySelector('p.my2');
@@ -210,16 +235,26 @@ describe('MeComponent Integration Tests', () => {
     it('should show delete button for non-admin users', () => {
       fixture.detectChanges();
       
+      // Handle HTTP request
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
+      fixture.detectChanges();
+      
       const deleteButton = compiled.querySelector('button[color="warn"]');
       expect(deleteButton).toBeTruthy();
       expect(deleteButton?.textContent).toContain('Detail'); // Button text
     });
 
     it('should hide delete button for admin users', () => {
-      // Arrange - Set up admin user
-      mockUserService.getById.mockReturnValue(of(mockAdminUser));
+      // Simulate admin user session
+      sessionService.logIn({ ...mockSessionInfo, id: 1, admin: true });
       
-      // Act
+      // Trigger ngOnInit
+      fixture.detectChanges();
+      
+      // Intercept and respond with admin user data
+      const req = httpMock.expectOne('api/user/1');
+      req.flush(mockAdminUser);
       fixture.detectChanges();
       
       // Assert - Delete button should not exist
@@ -230,7 +265,11 @@ describe('MeComponent Integration Tests', () => {
 
   describe('User interactions', () => {
     beforeEach(() => {
-      fixture.detectChanges(); // Initialize component
+      // Initialize component and handle HTTP request
+      fixture.detectChanges();
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
+      fixture.detectChanges();
     });
 
     it('should call back() when back button is clicked', () => {
@@ -258,44 +297,65 @@ describe('MeComponent Integration Tests', () => {
       
       // Assert
       expect(deleteSpy).toHaveBeenCalled();
+      
+      // Handle the DELETE HTTP request triggered by delete()
+      const req = httpMock.expectOne('api/user/2');
+      expect(req.request.method).toBe('DELETE');
+      req.flush({});
     });
 
-    it('should trigger service calls when delete button is clicked', () => {
+    it('should trigger real service calls when delete button is clicked', () => {
+      // Verify initial session state
+      expect(sessionService.isLogged).toBe(true);
+      
       // Act - Click delete button
       const deleteButton = compiled.querySelector('button[color="warn"]') as HTMLButtonElement;
       deleteButton.click();
       
-      // Assert - Verify service method calls
-      expect(mockUserService.delete).toHaveBeenCalledWith('1');
+      // Intercept the REAL HTTP DELETE request made by UserService
+      const req = httpMock.expectOne('api/user/2');
+      expect(req.request.method).toBe('DELETE');
+      
+      // Respond to the request
+      req.flush({});
+      
+      // Assert - Verify side effects
       expect(mockMatSnackBar.open).toHaveBeenCalledWith(
         'Your account has been deleted !', 
         'Close', 
         { duration: 3000 }
       );
-      expect(mockSessionService.logOut).toHaveBeenCalled();
+      expect(sessionService.isLogged).toBe(false);
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
     });
   });
 
   describe('Loading states', () => {
     it('should not display user content when user is undefined', () => {
-      // Arrange - Prevent ngOnInit from loading data
-      mockUserService.getById.mockReturnValue(of(undefined as any));
-      
-      // Act - Trigger component initialization
-      fixture.detectChanges(); // This calls ngOnInit
-      
-      // Manually set user to undefined to simulate loading state
+      // Manually set user to undefined (component exists but no data loaded yet)
       component.user = undefined;
-      fixture.detectChanges(); // Re-render with undefined user
+      
+      // Render without user data
+      fixture.detectChanges();
       
       // Assert - User content should not be visible
       const userContent = compiled.querySelector('div[fxLayout="column"]');
       expect(userContent).toBeFalsy();
+      
+      // Note: ngOnInit was already called in global beforeEach
+      // We need to flush that request to avoid test errors
+      const req = httpMock.match('api/user/2');
+      if (req.length > 0) {
+        req[0].flush(mockRegularUser);
+      }
     });
 
     it('should display user content when user is loaded', () => {
-      // User is loaded in beforeEach via ngOnInit mock
+      // Trigger ngOnInit and load user data
+      fixture.detectChanges();
+      
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
       fixture.detectChanges();
       
       const userContent = compiled.querySelector('div[fxLayout="column"]');
@@ -303,8 +363,8 @@ describe('MeComponent Integration Tests', () => {
     });
 
     it('should not display user content initially before ngOnInit', () => {
+      // Create component but do NOT call fixture.detectChanges()
       // Don't call fixture.detectChanges() yet
-      // Component exists but ngOnInit hasn't run
       
       const userContent = compiled.querySelector('div[fxLayout="column"]');
       expect(userContent).toBeFalsy();
@@ -313,6 +373,11 @@ describe('MeComponent Integration Tests', () => {
 
   describe('DebugElement approach (Alternative testing method)', () => {
     it('should find elements using DebugElement and CSS selectors', () => {
+      fixture.detectChanges();
+      
+      // Handle HTTP request
+      const req = httpMock.expectOne('api/user/2');
+      req.flush(mockRegularUser);
       fixture.detectChanges();
       
       // Using DebugElement for more precise element selection
@@ -326,6 +391,11 @@ describe('MeComponent Integration Tests', () => {
     it('should trigger click events using DebugElement', () => {
       fixture.detectChanges();
       
+      // Handle initial HTTP request
+      const req1 = httpMock.expectOne('api/user/2');
+      req1.flush(mockRegularUser);
+      fixture.detectChanges();
+      
       const deleteSpy = jest.spyOn(component, 'delete');
       
       // Find delete button using DebugElement
@@ -335,6 +405,11 @@ describe('MeComponent Integration Tests', () => {
       deleteButtonDebug.triggerEventHandler('click', null);
       
       expect(deleteSpy).toHaveBeenCalled();
+      
+      // Handle DELETE HTTP request
+      const req2 = httpMock.expectOne('api/user/2');
+      expect(req2.request.method).toBe('DELETE');
+      req2.flush({});
     });
   });
 });
