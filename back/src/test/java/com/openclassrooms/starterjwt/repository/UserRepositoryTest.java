@@ -30,7 +30,7 @@ public class UserRepositoryTest {
     // Initialisation avant chaque test
     @BeforeEach
     public void setup() {
-        user = userMocks.createUser(1L, "andre_test@mail.com", "André", "password!123", "private!123", false, false );
+        user = userMocks.createUser(1L, "andre_test@mail.com", "Margot", "password!123", "private!123", false, false );
     }
     // Nettoyage après chaque test
     @AfterEach

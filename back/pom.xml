@@ -20,6 +20,7 @@
   <properties>
     <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
+    <maven.surefire.useModulePath>false</maven.surefire.useModulePath>
   </properties>
 
   <dependencies>
@@ -47,8 +48,9 @@
       <artifactId>h2</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.0.33</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -94,7 +96,7 @@
 
   <build>
     <plugins>
-      <!-- Compiler + annotation processors (MapStruct/Lombok) -->
+      <!-- Compiler + annotation processors -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -116,12 +118,11 @@
         </configuration>
       </plugin>
 
-      <!-- Spring Boot (une seule déclaration) -->
+      <!-- Spring Boot -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <!-- éviter d’embarquer Lombok dans le JAR -->
           <excludes>
             <exclude>
               <groupId>org.projectlombok</groupId>
@@ -131,23 +132,29 @@
         </configuration>
       </plugin>
 
-      <!-- JaCoCo (optionnel) -->
+      <!-- JaCoCo (Java 17 compatible) -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.5</version>
+        <version>0.8.11</version>
         <executions>
           <execution>
-            <goals><goal>prepare-agent</goal></goals>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
           </execution>
           <execution>
             <id>report</id>
             <phase>test</phase>
-            <goals><goal>report</goal></goals>
+            <goals>
+              <goal>report</goal>
+            </goals>
           </execution>
           <execution>
             <id>jacoco-check</id>
-            <goals><goal>check</goal></goals>
+            <goals>
+              <goal>check</goal>
+            </goals>
             <configuration>
               <rules>
                 <rule>
@@ -164,6 +171,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Surefire (Java 17 OK) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <useModulePath>${maven.surefire.useModulePath}</useModulePath>
+        </configuration>
       </plugin>
     </plugins>
   </build>

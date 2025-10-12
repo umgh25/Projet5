@@ -30,7 +30,7 @@ public class UserMapperTest {
     @Test
     @DisplayName("Map User entity to UserDto")
     public void shouldMapUserEntityToUserDto() {
-        User user = userMocks.createUser(1L, "andré.test@mail.com", "Test", "André", "password123", true, false);
+        User user = userMocks.createUser(1L, "Margot.test@mail.com", "Test", "Margot", "password123", true, false);
         UserDto userDto = userMapper.toDto(user);
 
         assertNotNull(userDto);

@@ -43,7 +43,7 @@ public class TeacherServiceTest {
     // Initialisation avant chaque test
     @BeforeEach
     void setUp() {
-        teacher = teacherMocks.createTeacher(TEACHER_ID, "Teacher", "Marc", false);
+        teacher = teacherMocks.createTeacher(TEACHER_ID, "Teacher", "Margot", false);
     }
     // Tests pour la méthode findAll
     @Nested
@@ -86,7 +86,7 @@ public class TeacherServiceTest {
             assertNotNull(result);
             assertEquals(TEACHER_ID, result.getId());
             assertEquals("Teacher", result.getLastName());
-            assertEquals("André", result.getFirstName());
+            assertEquals("Margot", result.getFirstName());
             verify(teacherRepository, times(1)).findById(TEACHER_ID);
         }
         // Tests pour les cas d'erreur dans la méthode findById

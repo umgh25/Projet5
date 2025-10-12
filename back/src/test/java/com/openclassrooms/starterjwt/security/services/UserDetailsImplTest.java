@@ -32,6 +32,7 @@ public class UserDetailsImplTest {
         assertEquals("password", userDetails.getPassword());
         assertTrue(userDetails.getAdmin());
     }
+
     // Test pour vérifier que getAuthorities() retourne une collection vide
     @Test
     @DisplayName("getAuthorities should return an empty collection")
@@ -41,17 +42,41 @@ public class UserDetailsImplTest {
         assertNotNull(authorities);
         assertTrue(authorities.isEmpty());
     }
+
     // Test pour vérifier que getPassword() retourne le mot de passe correct
     @Test
     @DisplayName("getPassword should return the correct password")
     public void getPassword_ShouldReturnCorrectPassword() {
         UserDetailsImpl userDetails = createTestUserDetails();
-
         assertEquals("password", userDetails.getPassword());
     }
+
+    // Test pour vérifier que isAccountNonExpired() retourne true
+    @Test
+    @DisplayName("isAccountNonExpired should return true")
+    public void isAccountNonExpired_ShouldReturnTrue() {
+        UserDetailsImpl userDetails = createTestUserDetails();
+        assertTrue(userDetails.isAccountNonExpired());
+    }
+
+    // Test pour vérifier que isAccountNonLocked() retourne true
+    @Test
+    @DisplayName("isAccountNonLocked should return true")
+    public void isAccountNonLocked_ShouldReturnTrue() {
+        UserDetailsImpl userDetails = createTestUserDetails();
+        assertTrue(userDetails.isAccountNonLocked());
+    }
+
+    // Test pour vérifier que isCredentialsNonExpired() retourne true
+    @Test
+    @DisplayName("isCredentialsNonExpired should return true")
+    public void isCredentialsNonExpired_ShouldReturnTrue() {
+        UserDetailsImpl userDetails = createTestUserDetails();
+        assertTrue(userDetails.isCredentialsNonExpired());
         assertTrue(userDetails.isEnabled());
     }
-    // Test pour vérifier que isAccountNonExpired() retourne true
+
+    // Test pour vérifier que equals should return true for objects with the same ID
     @Test
     @DisplayName("equals should return true for objects with the same ID")
     public void equals_WithSameId_ShouldReturnTrue() {
@@ -60,7 +85,8 @@ public class UserDetailsImplTest {
 
         assertEquals(userDetails1, userDetails2);
     }
-    // Test pour vérifier que isAccountNonLocked() retourne true
+
+    // Test pour vérifier que equals should return false for objects with different IDs
     @Test
     @DisplayName("equals should return false for objects with different IDs")
     public void equals_WithDifferentIds_ShouldReturnFalse() {
@@ -69,7 +95,8 @@ public class UserDetailsImplTest {
 
         assertNotEquals(userDetails1, userDetails2);
     }
-    // Test pour vérifier que isCredentialsNonExpired() retourne true
+
+    // Test pour vérifier que equals should return false for null or different type
     @Test
     @DisplayName("equals should return false for null or different type")
     public void equals_WithNullOrDifferentType_ShouldReturnFalse() {
@@ -77,6 +104,7 @@ public class UserDetailsImplTest {
         assertNotEquals(userDetails, null);
         assertNotEquals(userDetails, new Object());
     }
+
     // Méthode utilitaire pour créer un objet UserDetailsImpl de test
     private UserDetailsImpl createTestUserDetails() {
         return UserDetailsImpl.builder()

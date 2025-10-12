@@ -71,7 +71,7 @@ public class SessionControllerTest {
     // Configuration des mocks avant chaque test
     @BeforeEach
     public void setup() {
-        Teacher testTeacher = teacherMocks.createTeacher(1L, "Test", "André", false);
+        Teacher testTeacher = teacherMocks.createTeacher(1L, "Test", "Margot", false);
         User testUser = userMocks.createUser(1L, "andre_test@mail.com", "Test", "Teacher", "private!123", false, false);
 
         testSession = sessionMocks.createSession(1L, testTeacher, Arrays.asList(testUser), false, false);

@@ -27,7 +27,7 @@ public class TeacherRepositoryTest {
     // Nettoyage avant chaque test
     @BeforeEach
     public void cleanUp() {
-        teacher = teacherMocks.createTeacher(1L, "Teacher", "André", false);
+        teacher = teacherMocks.createTeacher(1L, "Teacher", "Margot", false);
     }
     // Tests
     @Test

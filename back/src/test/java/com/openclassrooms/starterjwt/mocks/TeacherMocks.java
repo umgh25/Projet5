@@ -24,7 +24,7 @@ public class TeacherMocks {
     }
     // Method to create a mock TeacherDto object
     public TeacherDto createTeacherDto(Long id, String lastName, String firstName, boolean longValues) {
-        String longLastName = "André".repeat(30);
+        String longLastName = "Margot".repeat(30);
         String longFirstName = "Test".repeat(30);
 
         TeacherDto teacherDto = new TeacherDto();
