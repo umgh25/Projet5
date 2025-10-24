@@ -4,11 +4,13 @@
   "scripts": {
     "start": "ng serve",
     "test": "jest",
+    "test:integration": "jest --testMatch \"**/*.int.spec.ts\" --runInBand",
     "test:watch": "jest --watch",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "e2e:ci": "ng run yoga:e2e-ci",
     "e2e:coverage": "npx nyc report --reporter=lcov --reporter=text-summary",
+    "coverage:integration": "jest --coverage --coverageDirectory=./coverage/integration --testMatch \"**/*.int.spec.ts\" --runInBand",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
@@ -25,7 +27,7 @@
     "@angular/platform-browser": "14.2.0",
     "@angular/platform-browser-dynamic": "14.2.0",
     "@angular/router": "14.2.0",
-    "rxjs": "7.5.6",
+    "rx²s": "7.5.6",
     "tslib": "2.4.0",
     "zone.js": "0.11.8"
   },

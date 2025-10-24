@@ -15,7 +15,7 @@ import { createRouterMock, sessionInformation } from 'src/mocks/auth.mocks';
 import { createUserServiceMock, userMock } from 'src/mocks/user.mocks';
 
 
-
+// Test environment pour le component MeComponent avec des mocks des services
 describe('MeComponent', () => {
   let component: MeComponent;
   let fixture: ComponentFixture<MeComponent>;
@@ -23,7 +23,7 @@ describe('MeComponent', () => {
   let router: jest.Mocked<Router>;
   let userService: jest.Mocked<UserService>;
   let matSnackBar: jest.Mocked<MatSnackBar>;
-
+  // Configuration du module de test avant chaque test
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
@@ -42,43 +42,43 @@ describe('MeComponent', () => {
         { provide: MatSnackBar, useValue: { open: jest.fn() } }
       ],
     }).compileComponents();
-
+    // Initialisation des variables avant chaque test
     fixture = TestBed.createComponent(MeComponent);
     component = fixture.componentInstance;
-
+    // Injection des services et création des mocks
     router = TestBed.inject(Router) as jest.Mocked<Router>;
     sessionService = TestBed.inject(SessionService);
     userService = TestBed.inject(UserService) as jest.Mocked<UserService>;
     matSnackBar = TestBed.inject(MatSnackBar) as jest.Mocked<MatSnackBar>;
-
+    // Mock de la méthode getById pour retourner un utilisateur fictif
     sessionService.logIn(sessionInformation);
     fixture.detectChanges();
   });
-
+  // Tests unitaires
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
+  // Vérification des méthodes du composant
   it('should have methods', () => {
     expect(component.ngOnInit).toBeDefined();
     expect(component.back).toBeInstanceOf(Function);
     expect(component.delete).toBeInstanceOf(Function);
   });
-
+  //  Test de la méthode ngOnInit
   it('should call userService.getById on ngOnInit', () => {
     const authenticatedUserId = sessionService.sessionInformation!.id.toString();
     component.ngOnInit();
     expect(userService.getById).toHaveBeenCalledWith(authenticatedUserId);
     expect(component.user).toEqual(userMock);
   });
-
+  // Test de la méthode back
   it('should call window.history.back() on back()', () => {
     const backSpy = jest.spyOn(window.history, 'back');
     component.back();
     expect(backSpy).toHaveBeenCalled();
   });
 
-
+  // Test de la méthode delete
   it('should call userService.delete, then sessionService.logOut and navigate', () => {
     expect(sessionService.isLogged).toBe(true);
 
@@ -88,7 +88,7 @@ describe('MeComponent', () => {
     const logOutSpy = jest.spyOn(sessionService, 'logOut');
 
     component.delete();
-
+    // Simuler la réponse asynchrone de la méthode delete
     expect(userService.delete).toHaveBeenCalledWith(authenticatedUserId);
     expect(matSnackBarSpy).toHaveBeenCalledWith('Your account has been deleted !', 'Close', { duration: 3000 });
     expect(sessionService.logOut).toHaveBeenCalled();
