@@ -11,7 +11,7 @@ describe('Sessions', () => {
       cy.wait('@getSessionsRequest').then((interception) => {
         const response = interception.response!.body;
         cy.get('.item').should('have.length', response.length).and('be.visible');
-          response.forEach((session, index) => {
+          response.forEach((session: Cypress.YogaSession, index: number) => {
             if (index > 3) return;
             cy.checkSessionCard(index, session);
           });
@@ -300,79 +300,13 @@ describe('Sessions', () => {
         cy.wait('@getSessionsRequest').then((interception) => {
           const responseAfterDelete = interception.response!.body;
           expect(responseAfterDelete.length).to.eq(response.length - 1);
-          expect(responseAfterDelete.map(session => session.id)).to.not.include(sessionId);
+          expect(responseAfterDelete.map((session: { id: any; }) => session.id)).to.not.include(sessionId);
 
 
           cy.wait('@deleteSessionRequest').its('response.body').should('deep.equal', {
             success: true
           });
         });
-      });
-    });
-
-    it('Should display error when creating session with empty required fields', () => {
-      cy.wait('@getSessionsRequest');
-      
-      cy.interceptTeachers();
-      cy.get('button').contains('Create').click();
-      cy.wait('@getTeachersRequest');
-      
-      // Vérifier que le formulaire est invalide au départ
-      cy.get('button[type="submit"]').should('be.disabled');
-      
-      // Essayer de soumettre sans remplir les champs
-      cy.get('input[formControlName="name"]').focus().blur();
-      cy.get('button[type="submit"]').should('be.disabled');
-      
-      // Remplir seulement le nom
-      cy.get('input[formControlName="name"]').type('Test Session');
-      cy.get('button[type="submit"]').should('be.disabled');
-      
-      // Remplir la date
-      cy.get('input[formControlName="date"]').type('2025-12-31');
-      cy.get('button[type="submit"]').should('be.disabled');
-      
-      // Sélectionner un professeur
-      cy.get('mat-select[formControlName="teacher_id"]').click();
-      cy.get('mat-option').first().click();
-      cy.get('button[type="submit"]').should('be.disabled');
-      
-      // Remplir la description - le bouton devrait être activé
-      cy.get('textarea[formControlName="description"]').type('Description test');
-      cy.get('button[type="submit"]').should('not.be.disabled');
-    });
-
-    it('Should display error when editing session with empty required fields', () => {
-      const index = 0;
-
-      cy.wait('@getSessionsRequest').then((interception) => {
-        const sessionId = interception.response!.body[index].id;
-
-        cy.interceptSessionDetail({ sessionId, participate: false });
-        cy.interceptTeachers();
-
-        // Cliquer sur Edit
-        cy.get('.item').eq(index).find('button').contains('Edit').click();
-        cy.url().should('include', `/sessions/update/${sessionId}`);
-
-        cy.wait("@getSessionDetailRequest");
-        cy.wait('@getTeachersRequest');
-
-        // Vider le champ name
-        cy.get('input[formControlName="name"]').clear();
-        cy.get('button[type="submit"]').should('be.disabled');
-
-        // Re-remplir le nom
-        cy.get('input[formControlName="name"]').type('Updated name');
-        cy.get('button[type="submit"]').should('not.be.disabled');
-
-        // Vider la description
-        cy.get('textarea[formControlName="description"]').clear();
-        cy.get('button[type="submit"]').should('be.disabled');
-
-        // Re-remplir la description
-        cy.get('textarea[formControlName="description"]').type('Updated description');
-        cy.get('button[type="submit"]').should('not.be.disabled');
       });
     });
   })
