@@ -57,14 +57,6 @@ Le projet utilise MySQL (par défaut) mais une autre base compatible JDBC peut �
 
 Voici des instructions pas‑à‑pas (Windows PowerShell) pour préparer la base et configurer l'application :
 
-
-Rapports de couverture frontend (chemins observés dans le dépôt) :
-
-- ➡️ Unitaires (Jest) : `front/coverage/jest/` ou `front/coverage/lcov-report/index.html` (selon la configuration de génération)
-- ➡️ Intégration : `front/coverage/integration/lcov-report/index.html`
-- ➡️ End-to-End (Cypress) : si vous générez la couverture E2E, elle apparaîtra sous `front/coverage/e2e/` (génération via `npm run e2e:coverage` ou l'équivalent)
-
-Vérifiez le dossier `front/coverage/` pour trouver les rapports index.html correspondant à chaque type de test.
 Ouvrez PowerShell et lancez le client MySQL :
 
 ```powershell
