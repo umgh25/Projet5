@@ -3,10 +3,11 @@
 Une application web de gestion de séances de yoga. Projet full‑stack composé d'un frontend Angular et d'un backend Spring Boot.
 
 ## 🎯 Objectif
-Fournir une application de démonstration complète pour :
-- gérer des utilisateurs (admin, enseignants, élèves)
-- organiser des séances et sessions de yoga
-- fournir des API REST sécurisées et une interface Angular réactive
+Assurer la **qualité logicielle complète** d’une application de gestion de yoga en réalisant :
+- des tests unitaires, d’intégration et end-to-end,
+- une couverture de **80 % minimum** du code,
+- **30 % de tests d’intégration**,
+tout en validant les fonctionnalités principales : gestion des utilisateurs, des séances et des API REST sécurisées.
 
 ## 🧭 Structure du dépôt
 - `back/` : backend Spring Boot (Java, Maven)
