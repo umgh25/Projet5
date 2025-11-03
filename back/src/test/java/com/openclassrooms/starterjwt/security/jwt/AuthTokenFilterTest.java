@@ -81,7 +81,7 @@ public class AuthTokenFilterTest {
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
         assertEquals(USERNAME, SecurityContextHolder.getContext().getAuthentication().getName());
     }
-    // Test uniataire pour si le token JWT est invalide
+    // Test unitaire pour si le token JWT est invalide
     @Test
     @DisplayName("Should not authenticate user when invalid JWT token is provided")
     void doFilterInternal_ShouldNotAuthenticateUser_WhenInvalidJwtTokenIsProvided() throws ServletException, IOException {
