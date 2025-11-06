@@ -10,18 +10,21 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
+import com.openclassrooms.starterjwt.security.jwt.AuthEntryPointJwt;
+import com.openclassrooms.starterjwt.security.services.UserDetailsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,32 +35,39 @@ import com.openclassrooms.starterjwt.repository.UserRepository;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 
-// Test d'intégration pour le AuthController
-@SpringBootTest
-@AutoConfigureMockMvc
+/**
+ * Tests unitaires du AuthController avec @WebMvcTest.
+ */
+@WebMvcTest(controllers = AuthController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class AuthControllerTest {
-    // Injection des dépendances nécessaires pour les tests
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
-    // Constructeur pour l'injection des dépendances
+
     @Autowired
-    public AuthControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-    }
-    // Mock des beans nécessaires pour les tests
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    // === Dépendances mockées ===
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
+
+    @MockBean
+    private AuthEntryPointJwt authEntryPointJwt;
+
     @MockBean
     private AuthenticationManager authenticationManager;
-    // Mock du JwtUtils pour la génération de tokens JWT
+
     @MockBean
     private JwtUtils jwtUtils;
-    // Mock du UserRepository pour les opérations sur les utilisateurs
+
     @MockBean
     private UserRepository userRepository;
-    // Mock du PasswordEncoder pour l'encodage des mots de passe
+
     @MockBean
     private PasswordEncoder passwordEncoder;
-    // Variables pour les tests
+
+    // === Données de test ===
     private Authentication authentication;
     private UserDetailsImpl userDetails;
     private User user;
@@ -92,7 +102,7 @@ public class AuthControllerTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("test@example.com");
         loginRequest.setPassword("password123");
-        
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
         when(jwtUtils.generateJwtToken(authentication)).thenReturn("test-jwt-token");
@@ -116,7 +126,7 @@ public class AuthControllerTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("admin@example.com");
         loginRequest.setPassword("adminPass");
-        
+
         User adminUser = User.builder()
                 .id(2L)
                 .email("admin@example.com")
@@ -125,7 +135,7 @@ public class AuthControllerTest {
                 .password("encodedAdminPassword")
                 .admin(true)
                 .build();
-        
+
         UserDetailsImpl adminDetails = UserDetailsImpl.builder()
                 .id(2L)
                 .username("admin@example.com")
@@ -134,7 +144,7 @@ public class AuthControllerTest {
                 .password("encodedAdminPassword")
                 .admin(true)
                 .build();
-        
+
         Authentication adminAuth = mock(Authentication.class);
         when(adminAuth.getPrincipal()).thenReturn(adminDetails);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(adminAuth);
@@ -168,7 +178,7 @@ public class AuthControllerTest {
         signupRequest.setFirstName("New");
         signupRequest.setLastName("User");
         signupRequest.setPassword("password123");
-        
+
         when(userRepository.existsByEmail("newuser@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
