@@ -17,7 +17,7 @@ import { expect } from '@jest/globals';
 import { MeComponent } from './me.component';
 
 /**
- * 🧪 Test d'intégration du composant MeComponent
+ * Test d'intégration du composant MeComponent
  *
  * Objectif : tester MeComponent branché à ses VRAIS services (SessionService, UserService),
  * avec rendu de template réel (Angular Material) et cycle de vie Angular,

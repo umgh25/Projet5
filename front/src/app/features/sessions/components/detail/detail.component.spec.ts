@@ -7,20 +7,19 @@ import { expect } from '@jest/globals';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import {
-  MatSnackBar,
-  MatSnackBarModule,
-} from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { DetailComponent } from './detail.component';
 import { SessionApiService } from '../../services/session-api.service';
 import { Session } from '../../interfaces/session.interface';
+import { Teacher } from 'src/app/interfaces/teacher.interface';
+
 import { SessionService } from 'src/app/services/session.service';
 import { TeacherService } from 'src/app/services/teacher.service';
+
 import { adminRequestMock, createSessionServiceMock } from 'src/mocks/session.mocks';
 import { createSessionApiServiceMock, sessionsMock } from 'src/mocks/session-api.mocks';
 import { createTeacherServiceMock, getAllTeachersResponseMock } from 'src/mocks/teacher.mocks';
-import { Teacher } from 'src/app/interfaces/teacher.interface';
-
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -33,7 +32,7 @@ describe('DetailComponent', () => {
   let matSnackBar: jest.Mocked<MatSnackBar>;
   let ngZone: NgZone;
 
-  const sessionId: string = '1';
+  const sessionId = '1';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -53,21 +52,20 @@ describe('DetailComponent', () => {
         { provide: MatSnackBar, useValue: { open: jest.fn() } },
         {
           provide: ActivatedRoute,
-          useValue: {
-            snapshot: { paramMap: { get: jest.fn().mockReturnValue(sessionId) } },
-          }
+          useValue: { snapshot: { paramMap: { get: jest.fn().mockReturnValue(sessionId) } } }
         }
       ],
     }).compileComponents();
+
     fixture = TestBed.createComponent(DetailComponent);
     component = fixture.componentInstance;
 
     router = TestBed.inject(Router);
-
     sessionService = TestBed.inject(SessionService) as jest.Mocked<SessionService>;
     matSnackBar = TestBed.inject(MatSnackBar) as jest.Mocked<MatSnackBar>;
     teacherService = TestBed.inject(TeacherService) as jest.Mocked<TeacherService>;
-    sessionApiService = TestBed.inject(SessionApiService) as unknown as jest.Mocked<SessionApiService>;
+    sessionApiService = TestBed.inject(SessionApiService) as jest.Mocked<SessionApiService>;
+    ngZone = TestBed.inject(NgZone);
 
     fixture.detectChanges();
   });
@@ -76,7 +74,7 @@ describe('DetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shoudld have methods', () => {
+  it('should expose needed methods', () => {
     expect(component.ngOnInit).toBeDefined();
     expect(component.back).toBeInstanceOf(Function);
     expect(component.delete).toBeInstanceOf(Function);
@@ -84,64 +82,85 @@ describe('DetailComponent', () => {
     expect(component.unParticipate).toBeInstanceOf(Function);
   });
 
-  it('should initialize sessionId, userId and isAdmin on creation', () => {
+  it('should initialize sessionId, userId and isAdmin', () => {
     expect(component.sessionId).toBe(sessionId);
     expect(component.userId).toBe(adminRequestMock.id.toString());
     expect(component.isAdmin).toBe(adminRequestMock.admin);
   });
 
-  it('should call fetchSession in ngOnInit', () => {
-    const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession');
+  // ----------------------------------------
+  // ngOnInit / fetchSession
+  // ----------------------------------------
+  it('should call services inside fetchSession() when ngOnInit runs', () => {
+    const sessionSpy = jest.spyOn(sessionApiService, 'detail');
+    const teacherSpy = jest.spyOn(teacherService, 'detail');
+
     component.ngOnInit();
-    expect(fetchSessionSpy).toHaveBeenCalled();
+
+    expect(sessionSpy).toHaveBeenCalledWith(sessionId);
+
+    const firstSession = sessionsMock[parseInt(sessionId) - 1];
+    expect(teacherSpy).toHaveBeenCalledWith(firstSession.teacher_id.toString());
   });
 
-  it('should navigate back on calling back()', () => {
+  it('should update component properties after fetching session', () => {
+    const targetSession: Session = sessionsMock[0];
+    const targetTeacher: Teacher = getAllTeachersResponseMock[targetSession.teacher_id - 1];
+    const isParticipating = targetSession.users.includes(sessionService.sessionInformation!.id);
+
+    component.ngOnInit();
+
+    expect(component.session).toEqual(targetSession);
+    expect(component.teacher).toEqual(targetTeacher);
+    expect(component.isParticipate).toEqual(isParticipating);
+  });
+
+  // ----------------------------------------
+  // back()
+  // ----------------------------------------
+  it('should navigate back when calling back()', () => {
     const historySpy = jest.spyOn(window.history, 'back');
     component.back();
     expect(historySpy).toHaveBeenCalled();
   });
 
-  it('should delete session and show snackbar on calling delete()', () => {
-    ngZone = TestBed.inject(NgZone);
-
+  // ----------------------------------------
+  // delete()
+  // ----------------------------------------
+  it('should delete session and show snackbar', () => {
     const routerSpy = jest.spyOn(router, 'navigate');
-    const matSnackBarSpy = jest.spyOn(matSnackBar, 'open');
+    const snackSpy = jest.spyOn(matSnackBar, 'open');
 
-    ngZone.run(() => {
-      component.delete();
-    });
+    ngZone.run(() => component.delete());
 
     expect(sessionApiService.delete).toHaveBeenCalledWith(sessionId);
-    expect(matSnackBarSpy).toHaveBeenCalledWith('Session deleted !', 'Close', { duration: 3000 });
+    expect(snackSpy).toHaveBeenCalledWith('Session deleted !', 'Close', { duration: 3000 });
     expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   });
 
-  it('should call participate and fetch session', () => {
-    const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession')
+  // ----------------------------------------
+  // participate()
+  // ----------------------------------------
+  it('should call participate API and refresh session', () => {
+    const sessionSpy = jest.spyOn(sessionApiService, 'participate');
+    const refreshSpy = jest.spyOn(sessionApiService, 'detail');
+
     component.participate();
-    expect(sessionApiService.participate).toHaveBeenCalledWith(sessionId, sessionService.sessionInformation!.id.toString());
-    expect(fetchSessionSpy).toHaveBeenCalled();
+
+    expect(sessionSpy).toHaveBeenCalledWith(sessionId, sessionService.sessionInformation!.id.toString());
+    expect(refreshSpy).toHaveBeenCalledWith(sessionId);
   });
 
-  it('should call unParticipate and fetch session', () => {
-    const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession');
+  // ----------------------------------------
+  // unParticipate()
+  // ----------------------------------------
+  it('should call unParticipate API and refresh session', () => {
+    const sessionSpy = jest.spyOn(sessionApiService, 'unParticipate');
+    const refreshSpy = jest.spyOn(sessionApiService, 'detail');
+
     component.unParticipate();
-    expect(sessionApiService.unParticipate).toHaveBeenCalledWith(sessionId, sessionService.sessionInformation!.id.toString());
-    expect(fetchSessionSpy).toHaveBeenCalled();
-  });
 
-  it('should fetch session and update properties', () => {
-    const targetSession: Session = sessionsMock[parseInt(sessionId) - 1];
-    const targetTeacher: Teacher = getAllTeachersResponseMock[targetSession.teacher_id - 1];
-    const isParticipating: boolean = targetSession.users.some(u => u === sessionService.sessionInformation!.id);
-
-    component['fetchSession']();
-    expect(sessionApiService.detail).toHaveBeenCalledWith(sessionId);
-    expect(teacherService.detail).toHaveBeenCalledWith(targetSession.teacher_id.toString());
-
-    expect(component.session).toEqual(targetSession);
-    expect(component.isParticipate).toEqual(isParticipating);
-    expect(component.teacher).toEqual(targetTeacher);
+    expect(sessionSpy).toHaveBeenCalledWith(sessionId, sessionService.sessionInformation!.id.toString());
+    expect(refreshSpy).toHaveBeenCalledWith(sessionId);
   });
 });
