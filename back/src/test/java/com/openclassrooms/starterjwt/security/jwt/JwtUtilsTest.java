@@ -18,7 +18,6 @@ import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-// Test unitaire pour JwtUtils
 @SpringBootTest
 public class JwtUtilsTest {
 
