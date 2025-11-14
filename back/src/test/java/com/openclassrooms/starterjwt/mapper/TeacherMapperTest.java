@@ -8,23 +8,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.mocks.TeacherMocks;
 import com.openclassrooms.starterjwt.models.Teacher;
 
-@SpringBootTest
+
 public class TeacherMapperTest {
 
-    private final TeacherMapper teacherMapper;
+    private final TeacherMapper teacherMapper = new TeacherMapperImpl();
     private final TeacherMocks teacherMocks = new TeacherMocks();
 
-    @Autowired
-    public TeacherMapperTest(TeacherMapper teacherMapper) {
-        this.teacherMapper = teacherMapper;
-    }
     // Tests de mappage
     @Test
     @DisplayName("Map Teacher entity to TeacherDto")

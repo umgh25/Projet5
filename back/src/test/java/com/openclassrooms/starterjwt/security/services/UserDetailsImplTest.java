@@ -1,21 +1,19 @@
 package com.openclassrooms.starterjwt.security.services;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.GrantedAuthority;
+import static org.junit.jupiter.api.Assertions.*;
 
 // Test unitaire pour UserDetailsImpl
-@SpringBootTest
 public class UserDetailsImplTest {
 
     @Test
     @DisplayName("Builder should create correct object")
-    public void builder_ShouldCreateCorrectObject() {
+    void builder_ShouldCreateCorrectObject() {
         UserDetailsImpl userDetails = UserDetailsImpl.builder()
                 .id(1L)
                 .username("test@example.com")
@@ -36,9 +34,11 @@ public class UserDetailsImplTest {
     // Test pour vérifier que getAuthorities() retourne une collection vide
     @Test
     @DisplayName("getAuthorities should return an empty collection")
-    public void getAuthorities_ShouldReturnEmptyCollection() {
+    void getAuthorities_ShouldReturnEmptyCollection() {
         UserDetailsImpl userDetails = createTestUserDetails();
+
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
         assertNotNull(authorities);
         assertTrue(authorities.isEmpty());
     }
@@ -46,7 +46,7 @@ public class UserDetailsImplTest {
     // Test pour vérifier que getPassword() retourne le mot de passe correct
     @Test
     @DisplayName("getPassword should return the correct password")
-    public void getPassword_ShouldReturnCorrectPassword() {
+    void getPassword_ShouldReturnCorrectPassword() {
         UserDetailsImpl userDetails = createTestUserDetails();
         assertEquals("password", userDetails.getPassword());
     }
@@ -54,7 +54,7 @@ public class UserDetailsImplTest {
     // Test pour vérifier que isAccountNonExpired() retourne true
     @Test
     @DisplayName("isAccountNonExpired should return true")
-    public void isAccountNonExpired_ShouldReturnTrue() {
+    void isAccountNonExpired_ShouldReturnTrue() {
         UserDetailsImpl userDetails = createTestUserDetails();
         assertTrue(userDetails.isAccountNonExpired());
     }
@@ -62,50 +62,51 @@ public class UserDetailsImplTest {
     // Test pour vérifier que isAccountNonLocked() retourne true
     @Test
     @DisplayName("isAccountNonLocked should return true")
-    public void isAccountNonLocked_ShouldReturnTrue() {
+    void isAccountNonLocked_ShouldReturnTrue() {
         UserDetailsImpl userDetails = createTestUserDetails();
         assertTrue(userDetails.isAccountNonLocked());
     }
 
-    // Test pour vérifier que isCredentialsNonExpired() retourne true
+    // Test pour vérifier que isCredentialsNonExpired() retourne true et que le compte est actif
     @Test
-    @DisplayName("isCredentialsNonExpired should return true")
-    public void isCredentialsNonExpired_ShouldReturnTrue() {
+    @DisplayName("isCredentialsNonExpired and isEnabled should return true")
+    void isCredentialsNonExpired_ShouldReturnTrue() {
         UserDetailsImpl userDetails = createTestUserDetails();
         assertTrue(userDetails.isCredentialsNonExpired());
         assertTrue(userDetails.isEnabled());
     }
 
-    // Test pour vérifier que equals should return true for objects with the same ID
+    // Test pour vérifier que equals() retourne true pour des IDs identiques
     @Test
     @DisplayName("equals should return true for objects with the same ID")
-    public void equals_WithSameId_ShouldReturnTrue() {
+    void equals_WithSameId_ShouldReturnTrue() {
         UserDetailsImpl userDetails1 = UserDetailsImpl.builder().id(1L).build();
         UserDetailsImpl userDetails2 = UserDetailsImpl.builder().id(1L).build();
 
         assertEquals(userDetails1, userDetails2);
     }
 
-    // Test pour vérifier que equals should return false for objects with different IDs
+    // Test pour vérifier que equals() retourne false pour des IDs différents
     @Test
     @DisplayName("equals should return false for objects with different IDs")
-    public void equals_WithDifferentIds_ShouldReturnFalse() {
+    void equals_WithDifferentIds_ShouldReturnFalse() {
         UserDetailsImpl userDetails1 = UserDetailsImpl.builder().id(1L).build();
         UserDetailsImpl userDetails2 = UserDetailsImpl.builder().id(2L).build();
 
         assertNotEquals(userDetails1, userDetails2);
     }
 
-    // Test pour vérifier que equals should return false for null or different type
+    // Test pour vérifier que equals() retourne false pour null ou un autre type
     @Test
     @DisplayName("equals should return false for null or different type")
-    public void equals_WithNullOrDifferentType_ShouldReturnFalse() {
+    void equals_WithNullOrDifferentType_ShouldReturnFalse() {
         UserDetailsImpl userDetails = createTestUserDetails();
+
         assertNotEquals(userDetails, null);
         assertNotEquals(userDetails, new Object());
     }
 
-    // Méthode utilitaire pour créer un objet UserDetailsImpl de test
+    // Méthode utilitaire pour créer un UserDetailsImpl de test
     private UserDetailsImpl createTestUserDetails() {
         return UserDetailsImpl.builder()
                 .id(1L)

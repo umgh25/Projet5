@@ -1,37 +1,33 @@
 package com.openclassrooms.starterjwt.security.jwt;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 // Test unitaire pour AuthEntryPointJwt
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class AuthEntryPointJwtTest {
 
+    @InjectMocks
     private AuthEntryPointJwt authEntryPointJwt;
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     
-    @Autowired
-    public AuthEntryPointJwtTest(AuthEntryPointJwt authEntryPointJwt, ObjectMapper objectMapper) {
-        this.authEntryPointJwt = authEntryPointJwt;
-        this.objectMapper = objectMapper;
-    }
     // Test pour vérifier que la méthode commence() configure correctement la réponse HTTP
     @Test
     @DisplayName("Entry point should set unauthorized response with correct JSON")
