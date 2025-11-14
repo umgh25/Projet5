@@ -17,15 +17,12 @@ import com.openclassrooms.starterjwt.dto.UserDto;
 import com.openclassrooms.starterjwt.mocks.UserMocks;
 import com.openclassrooms.starterjwt.models.User;
 
-@SpringBootTest
+
 public class UserMapperTest {
-   private final UserMapper userMapper;
-   private final UserMocks userMocks = new UserMocks();
+    private final UserMapper userMapper = new UserMapperImpl();
+    private final UserMocks userMocks = new UserMocks();
     // Constructeur avec injection de dépendances
-    @Autowired
-    public UserMapperTest(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
+
     // Tests de mappage
     @Test
     @DisplayName("Map User entity to UserDto")

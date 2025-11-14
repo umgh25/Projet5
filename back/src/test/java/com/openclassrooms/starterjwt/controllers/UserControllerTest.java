@@ -34,29 +34,34 @@ import com.openclassrooms.starterjwt.services.UserService;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-// Test unitaire pour le UserController en utilisant MockMvc
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserControllerTest {
 
+    // MockMvc pour simuler les requêtes HTTP vers le contrôleur
     private MockMvc mockMvc;
 
+    // Injection de MockMvc via le constructeur
     @Autowired
     public UserControllerTest(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
+    // Services et mappers simulés avec @MockBean
     @MockBean
     private UserService userService;
 
     @MockBean
     private UserMapper userMapper;
 
+    // Données de test
     private User testUser;
     private UserDto testUserDto;
-    // Initialisation des données de test avant chaque test
-    @BeforeEach 
+
+    // Préparation des données avant chaque test
+    @BeforeEach
     public void setup() {
+        // Création d’un utilisateur de test
         testUser = User.builder()
                 .id(1L)
                 .email("test@example.com")
@@ -68,6 +73,7 @@ public class UserControllerTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        // Création du DTO correspondant à l'utilisateur
         testUserDto = new UserDto();
         testUserDto.setId(1L);
         testUserDto.setEmail("test@example.com");
@@ -77,17 +83,19 @@ public class UserControllerTest {
         testUserDto.setCreatedAt(testUser.getCreatedAt());
         testUserDto.setUpdatedAt(testUser.getUpdatedAt());
 
+        // Mock du mapper pour convertir User → UserDto
         when(userMapper.toDto(testUser)).thenReturn(testUserDto);
     }
-    // Test pour la récupération d'un utilisateur par ID
+
+    // Test GET /api/user/{id} - succès
     @Test
     @DisplayName("GET /api/user/{id} - Success")
     public void testGetUserById_Success() throws Exception {
         when(userService.findById(1L)).thenReturn(testUser);
 
         mockMvc.perform(get("/api/user/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("test@example.com"))
@@ -97,58 +105,62 @@ public class UserControllerTest {
         verify(userService).findById(1L);
         verify(userMapper).toDto(testUser);
     }
-    // Test pour le cas où l'utilisateur n'est pas trouvé
+
+    // Test GET /api/user/{id} - utilisateur non trouvé
     @Test
     @DisplayName("GET /api/user/{id} -> User Not Found")
     public void testGetUserById_NotFound() throws Exception {
         when(userService.findById(99L)).thenReturn(null);
-        
+
         mockMvc.perform(get("/api/user/99")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isNotFound());
 
         verify(userService).findById(99L);
         verify(userMapper, never()).toDto(any(User.class));
     }
-    // Test pour le cas où l'ID fourni est invalide
+
+    // Test GET /api/user/{id} - ID invalide (non numérique)
     @Test
     @DisplayName("GET /api/user/{id} -> Invalid ID")
     public void testGetUserById_InvalidId() throws Exception {
         mockMvc.perform(get("/api/user/invalid")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isBadRequest());
-                
+
         verify(userService, never()).findById(any());
     }
-    // Test pour la suppression d'un utilisateur par ID
+
+    // Test DELETE /api/user/{id} - suppression réussie par l'utilisateur lui-même
     @Test
     @DisplayName("DELETE /api/user/{id} -> Success")
     public void testDeleteUser_Success() throws Exception {
         when(userService.findById(1L)).thenReturn(testUser);
-        
-        // Configuration explicite de l'utilisateur dans le SecurityContextHolder
-        org.springframework.security.core.userdetails.User userDetails = 
-            new org.springframework.security.core.userdetails.User(
-                testUser.getEmail(), "password", Collections.emptyList());
-        
+
+        // Configuration manuelle du contexte de sécurité avec un utilisateur authentifié
+        org.springframework.security.core.userdetails.User userDetails =
+                new org.springframework.security.core.userdetails.User(
+                        testUser.getEmail(), "password", Collections.emptyList());
+
         Authentication auth = new UsernamePasswordAuthenticationToken(
-            userDetails, null, userDetails.getAuthorities());
-            
+                userDetails, null, userDetails.getAuthorities());
+
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(auth);
         SecurityContextHolder.setContext(securityContext);
 
         mockMvc.perform(delete("/api/user/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user(testUser.getEmail())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user(testUser.getEmail())))
                 .andExpect(status().isOk());
-                
+
         verify(userService).findById(1L);
         verify(userService).delete(1L);
     }
-    // Test pour le cas où un utilisateur tente de supprimer un autre utilisateur
+
+    // Test DELETE /api/user/{id} - tentative de suppression d’un autre utilisateur
     @Test
     @DisplayName("DELETE /api/user/{id} -> Unauthorized")
     public void testDeleteUser_Unauthorized() throws Exception {
@@ -162,52 +174,56 @@ public class UserControllerTest {
                 .build();
 
         when(userService.findById(2L)).thenReturn(differentUser);
-        
+
         mockMvc.perform(delete("/api/user/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isUnauthorized());
-                
+
         verify(userService).findById(2L);
         verify(userService, never()).delete(anyLong());
     }
-    // Test pour le cas où l'utilisateur à supprimer n'existe pas
+
+    // Test DELETE /api/user/{id} - utilisateur inexistant
     @Test
     @DisplayName("DELETE /api/user/{id} -> User Not Found")
     public void testDeleteUser_NotFound() throws Exception {
         when(userService.findById(99L)).thenReturn(null);
-        
+
         mockMvc.perform(delete("/api/user/99")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isNotFound());
-                
+
         verify(userService).findById(99L);
         verify(userService, never()).delete(anyLong());
     }
-    // Test pour le cas où l'ID fourni est invalide
+
+    // Test DELETE /api/user/{id} - ID invalide
     @Test
     @DisplayName("DELETE /api/user/{id} - Invalid ID")
     public void testDeleteUser_InvalidId() throws Exception {
         mockMvc.perform(delete("/api/user/invalid")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.user("test@example.com")))
                 .andExpect(status().isBadRequest());
-                
+
         verify(userService, never()).findById(any());
         verify(userService, never()).delete(anyLong());
     }
-    // Test pour le cas où l'utilisateur n'est pas authentifié
+
+    // Test DELETE /api/user/{id} - utilisateur non authentifié
     @Test
     @DisplayName("DELETE /api/user/{id} -> No Authentication")
     public void testDeleteUser_NoAuthentication() throws Exception {
+        // Suppression du contexte de sécurité
         SecurityContextHolder.clearContext();
         when(userService.findById(1L)).thenReturn(testUser);
 
         mockMvc.perform(delete("/api/user/1")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
-                
+
         verify(userService, never()).delete(anyLong());
     }
 }
